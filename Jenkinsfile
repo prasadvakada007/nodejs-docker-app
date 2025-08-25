@@ -3,7 +3,8 @@ pipeline {
 
   environment {
     DOCKERHUB_CREDENTIALS = credentials('dockerhub-cred')
-    DOCKER_IMAGE = "vakada007/nodejs-app"  // change to your DockerHub repo
+    DOCKER_IMAGE = "vakada007/nodejs-app"
+    IMAGE_TAG = ""
   }
 
   options {
@@ -21,7 +22,6 @@ pipeline {
     stage('Node Install & Build') {
       steps {
         bat '''
-          set -e
           node -v
           npm -v
           npm install
@@ -32,7 +32,7 @@ pipeline {
     stage('Compute Tags') {
       steps {
         script {
-          def gitSha = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
+          def gitSha = bat(returnStdout: true, script: "git rev-parse --short HEAD").trim()
           env.IMAGE_TAG = "${env.BUILD_NUMBER}-${gitSha}"
           echo "Image tag: ${env.IMAGE_TAG}"
         }
@@ -41,10 +41,7 @@ pipeline {
 
     stage('Docker Build') {
       steps {
-        bat '''
-          set -e
-          docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} .
-        '''
+        bat "docker build -t %DOCKER_IMAGE%:%IMAGE_TAG% ."
       }
     }
 
@@ -52,12 +49,10 @@ pipeline {
       steps {
         script {
           docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-cred') {
-            sh "docker push ${DOCKER_IMAGE}:${IMAGE_TAG}"
-            sh "docker tag ${DOCKER_IMAGE}:${IMAGE_TAG} ${DOCKER_IMAGE}:latest"
-            sh "docker push ${DOCKER_IMAGE}:latest"
+            bat "docker push %DOCKER_IMAGE%:%IMAGE_TAG%"
+            bat "docker tag %DOCKER_IMAGE%:%IMAGE_TAG% %DOCKER_IMAGE%:latest"
+            bat "docker push %DOCKER_IMAGE%:latest"
           }
-          writeFile file: 'image-info.txt', text: "${DOCKER_IMAGE}:${IMAGE_TAG}"
-          archiveArtifacts artifacts: 'image-info.txt'
         }
       }
     }
