@@ -32,13 +32,14 @@ pipeline {
     stage('Compute Tags') {
       steps {
         script {
-          // Get short git commit hash
-          def gitSha = bat(returnStdout: true, script: "git rev-parse --short HEAD").trim()
-          
-          // Create unique image tag
+          // Run git command and clean output
+          def gitSha = bat(
+            script: "git rev-parse --short HEAD",
+            returnStdout: true
+          ).trim().split("\\r?\\n")[-1]   // take last line only
+
           env.IMAGE_TAG = "${BUILD_NUMBER}-${gitSha}"
-          
-          echo "Image tag: ${env.IMAGE_TAG}"
+          echo "✅ Image tag: ${env.IMAGE_TAG}"
         }
       }
     }
