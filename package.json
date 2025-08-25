@@ -1,0 +1,11 @@
+{
+  "name": "nodejs-docker-app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node app.js",
+    "build": "echo 'No build step yet' && exit 0"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
