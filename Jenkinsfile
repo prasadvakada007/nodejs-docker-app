@@ -53,14 +53,14 @@ pipeline {
     }
 
     stage('Trigger Deploy-Job') {
-      steps {
-        build job: 'Deploy-Job', parameters: [
-          string(name: 'DOCKER_IMAGE', value: "${DOCKER_IMAGE}:${IMAGE_TAG}"),
-          string(name: 'PORT', value: "3000")
-        ], wait: false
-      }
+    steps {
+        build job: 'Deploy-job',
+              parameters: [
+                  string(name: 'IMAGE_NAME', value: "vakada007/nodejs-app:${IMAGE_TAG}")
+              ]
     }
-  }
+}
+
 
   post {
     success {
