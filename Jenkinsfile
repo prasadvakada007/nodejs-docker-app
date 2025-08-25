@@ -32,8 +32,12 @@ pipeline {
     stage('Compute Tags') {
       steps {
         script {
+          // Get short git commit hash
           def gitSha = bat(returnStdout: true, script: "git rev-parse --short HEAD").trim()
-          env.IMAGE_TAG = "${env.BUILD_NUMBER}-${gitSha}"
+          
+          // Create unique image tag
+          env.IMAGE_TAG = "${BUILD_NUMBER}-${gitSha}"
+          
           echo "Image tag: ${env.IMAGE_TAG}"
         }
       }
@@ -41,7 +45,7 @@ pipeline {
 
     stage('Docker Build') {
       steps {
-        bat "docker build -t %DOCKER_IMAGE%:%IMAGE_TAG% ."
+        bat "docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} ."
       }
     }
 
@@ -49,9 +53,9 @@ pipeline {
       steps {
         script {
           docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-cred') {
-            bat "docker push %DOCKER_IMAGE%:%IMAGE_TAG%"
-            bat "docker tag %DOCKER_IMAGE%:%IMAGE_TAG% %DOCKER_IMAGE%:latest"
-            bat "docker push %DOCKER_IMAGE%:latest"
+            bat "docker push ${DOCKER_IMAGE}:${IMAGE_TAG}"
+            bat "docker tag ${DOCKER_IMAGE}:${IMAGE_TAG} ${DOCKER_IMAGE}:latest"
+            bat "docker push ${DOCKER_IMAGE}:latest"
           }
         }
       }
