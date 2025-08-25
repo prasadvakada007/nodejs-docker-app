@@ -1,10 +1,9 @@
-i added this into my jenkins file is it ok pipeline {
+pipeline {
   agent any
 
   environment {
     DOCKERHUB_CREDENTIALS = credentials('dockerhub-cred')
-    DOCKER_IMAGE = "vakada007/nodejs-app"  // TODO: change this
-    IMAGE_TAG = "${env.IMAGE_TAG}"                 // also add git short sha below
+    DOCKER_IMAGE = "vakada007/nodejs-app"  // change to your DockerHub repo
   }
 
   options {
@@ -25,8 +24,7 @@ i added this into my jenkins file is it ok pipeline {
           set -e
           node -v
           npm -v
-          npm ci
-          npm run build
+          npm install
         '''
       }
     }
@@ -55,7 +53,6 @@ i added this into my jenkins file is it ok pipeline {
         script {
           docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-cred') {
             sh "docker push ${DOCKER_IMAGE}:${IMAGE_TAG}"
-            // optionally also push 'latest'
             sh "docker tag ${DOCKER_IMAGE}:${IMAGE_TAG} ${DOCKER_IMAGE}:latest"
             sh "docker push ${DOCKER_IMAGE}:latest"
           }
@@ -77,10 +74,10 @@ i added this into my jenkins file is it ok pipeline {
 
   post {
     success {
-      echo "Build complete. Pushed ${DOCKER_IMAGE}:${IMAGE_TAG}"
+      echo "✅ Build complete. Pushed ${DOCKER_IMAGE}:${IMAGE_TAG}"
     }
     failure {
-      echo "Pipeline failed."
+      echo "❌ Pipeline failed."
     }
   }
 }
