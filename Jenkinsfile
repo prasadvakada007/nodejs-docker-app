@@ -26,7 +26,6 @@ pipeline {
     stage('Compute Tags') {
       steps {
         script {
-          // Run git command and capture only the last line
           def gitSha = bat(returnStdout: true, script: '@echo off && git rev-parse --short HEAD').trim()
           env.IMAGE_TAG = "${BUILD_NUMBER}-${gitSha}"
           echo "✅ Image tag: ${env.IMAGE_TAG}"
@@ -53,14 +52,14 @@ pipeline {
     }
 
     stage('Trigger Deploy-Job') {
-    steps {
+      steps {
         build job: 'Deploy-job',
               parameters: [
                   string(name: 'IMAGE_NAME', value: "vakada007/nodejs-app:${IMAGE_TAG}")
               ]
+      }
     }
-}
-
+  }   // ✅ closes stages block
 
   post {
     success {
