@@ -35,7 +35,7 @@ pipeline {
 
     stage('Docker Build') {
       steps {
-        bat "docker build -t %DOCKER_IMAGE%:%IMAGE_TAG% ."
+        bat "docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} ."
       }
     }
 
@@ -43,9 +43,9 @@ pipeline {
       steps {
         script {
           docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-cred') {
-            bat "docker push %DOCKER_IMAGE%:%IMAGE_TAG%"
-            bat "docker tag %DOCKER_IMAGE%:%IMAGE_TAG% %DOCKER_IMAGE%:latest"
-            bat "docker push %DOCKER_IMAGE%:latest"
+            bat "docker push ${DOCKER_IMAGE}:${IMAGE_TAG}"
+            bat "docker tag ${DOCKER_IMAGE}:${IMAGE_TAG} ${DOCKER_IMAGE}:latest"
+            bat "docker push ${DOCKER_IMAGE}:latest"
           }
         }
       }
