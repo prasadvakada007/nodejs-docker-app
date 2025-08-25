@@ -20,7 +20,7 @@ pipeline {
 
     stage('Node Install & Build') {
       steps {
-        sh '''
+        bat '''
           set -e
           node -v
           npm -v
@@ -41,7 +41,7 @@ pipeline {
 
     stage('Docker Build') {
       steps {
-        sh '''
+        bat '''
           set -e
           docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} .
         '''
