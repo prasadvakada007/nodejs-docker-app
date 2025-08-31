@@ -44,8 +44,8 @@ pipeline {
         script {
           docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-cred') {
             bat "docker push ${DOCKER_IMAGE}:${IMAGE_TAG}"
-            bat "docker tag ${DOCKER_IMAGE}:${IMAGE_TAG} ${DOCKER_IMAGE}:latest"
-            bat "docker push ${DOCKER_IMAGE}:latest"
+            bat "docker tag ${DOCKER_IMAGE}:${IMAGE_TAG} ${DOCKER_IMAGE}:${IMAGE_TAG}"
+            bat "docker push ${DOCKER_IMAGE}:${IMAGE_TAG}"
           }
         }
       }
